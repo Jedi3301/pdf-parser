@@ -1,38 +1,43 @@
 import re
 
 
+REQUIRED_KEYS = [
+    "invoice_number",
+    "invoice_date",
+    "seller_name",
+    "seller_gstin",
+    "buyer_name",
+    "description",
+    "taxable_amount",
+    "invoice_total",
+]
+
+OPTIONAL_KEYS = [
+    "buyer_gstin",
+    "hsn_code",
+    "quantity",
+    "unit",
+    "rate",
+    "cgst_rate",
+    "cgst_amount",
+    "sgst_rate",
+    "sgst_amount",
+    "igst_rate",
+    "igst_amount",
+    "cess_rate",
+    "cess_amount",
+    "tcs_rate",
+    "tcs_amount",
+    "eway_bill_number",
+    "vehicle_number",
+    "amount_in_words",
+]
+
+
 def parse_bill_data(text_pages):
     full_text = "\n".join(text_pages)
 
-    bill_data = {
-        "invoice_number": "",
-        "invoice_date": "",
-        "seller_name": "",
-        "seller_gstin": "",
-        "buyer_name": "",
-        "buyer_gstin": "",
-        "description": "",
-        "hsn_code": "",
-        "quantity": "",
-        "unit": "",
-        "rate": "",
-        "taxable_amount": "",
-        "cgst_rate": "",
-        "cgst_amount": "",
-        "sgst_rate": "",
-        "sgst_amount": "",
-        "igst_rate": "",
-        "igst_amount": "",
-        "cess_rate": "",
-        "cess_amount": "",
-        "tcs_rate": "",
-        "tcs_amount": "",
-        "invoice_total": "",
-        "eway_bill_number": "",
-        "vehicle_number": "",
-        "dispatch_location": "",
-        "amount_in_words": "",
-    }
+    bill_data = {key: "" for key in REQUIRED_KEYS + OPTIONAL_KEYS}
 
     # Invoice Number
     m = re.search(r'(?:Invoice No|Invoice Number|Inv No)[:\s]*([A-Za-z0-9-/]+)', full_text, re.IGNORECASE)
@@ -127,7 +132,7 @@ def parse_bill_data(text_pages):
     if m: bill_data['invoice_total'] = m.group(1).strip()
 
     # E-Way Bill Number
-    m = re.search(r'(?:E-Way Bill No|E-Way Bill Number|e-Way Bill No)[:\s]*(\d{12})', full_text, re.IGNORECASE)
+    m = re.search(r'(?:E-Way Bill No|E-Way Bill Number)[:\s]*(\d{12})', full_text, re.IGNORECASE)
     if m: bill_data['eway_bill_number'] = m.group(1).strip()
 
     # Vehicle Number
@@ -135,11 +140,16 @@ def parse_bill_data(text_pages):
     if m: bill_data['vehicle_number'] = m.group(1).strip()
 
     # Dispatch Location
-    m = re.search(r'(?:Despatch From|Dispatch From|Dispatched From)[:\s]*(.*?)(?:\n|GSTIN)', full_text, re.IGNORECASE | re.DOTALL)
+    m = re.search(r'(?:Despatch From|Dispatch From)[:\s]*(.*?)(?:\n|GSTIN)', full_text, re.IGNORECASE | re.DOTALL)
     if m: bill_data['dispatch_location'] = m.group(1).strip()
 
     # Amount in Words
     m = re.search(r'(?:Amount In Words|Amount Chargeable\s*\(in words\)|Rupees In Words)[:\s]*(.*?)(?:\n|$)', full_text, re.IGNORECASE)
     if m: bill_data['amount_in_words'] = m.group(1).strip()
+
+    # --- Validation ---
+    missing = [key for key in REQUIRED_KEYS if not bill_data.get(key)]
+    if missing:
+        raise ValueError(f"Missing required fields: {missing}")
 
     return bill_data
