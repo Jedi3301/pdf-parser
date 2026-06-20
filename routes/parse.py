@@ -14,6 +14,6 @@ async def parse_invoice(file: UploadFile = File(...)):
     pdf_bytes = await file.read()
     raw_text = extract_text_from_pdf(pdf_bytes)
     print(raw_text)
-    kv_result = parse_bill_data
-    print(kv_result)
-    return kv_result
+    # kv_result = parse_bill_data(raw_text)
+    # print(kv_result)
+    return raw_text

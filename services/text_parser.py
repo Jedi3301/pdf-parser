@@ -154,35 +154,4 @@ def parse_bill_data(text_pages):
 
     return bill_data
 
-
-# --- Test block ---
-if __name__ == "__main__":
-    sample_text = """
-    Invoice No: INV-2024-001
-    Invoice Date: 01/06/2024
-    Seller Name: ABC Coal Suppliers Pvt Ltd
-    GSTIN No: 27AABCC1234D1Z5
-    Consignee: XYZ Industries Ltd
-    Description of Goods: Steam Coal
-    HSN Code: 27011990
-    Quantity: 500
-    Per: MT
-    Rate (PMT): 8500
-    Amount (Rs.): 42,50,000
-    CGST @ 2.5%: 1,06,250
-    SGST @ 2.5%: 1,06,250
-    Compensation Cess (PMT): 400
-    Total Invoice Amount: Rs. 44,62,500
-    TCS Payable Amount: 44,625
-    E-Way Bill No: 123456789012
-    Truck No: MH 12 AB 1234
-    Despatch From: Nagpur
-    Amount In Words: Forty Four Lakhs Sixty Two Thousand Five Hundred Only
-    """
-
-    result = parse_bill_data([sample_text])
-
-    print("\n--- Parsed Output ---")
-    for k, v in result.items():
-        print(f"  {k}: {v}")
     
